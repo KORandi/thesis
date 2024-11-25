@@ -16,8 +16,8 @@ import { Button } from "@/components/ui/button";
 
 import "ckeditor5/ckeditor5.css";
 import "@thesis/ckeditor5-ghost-text/index.css";
-// import { LLMConnector } from "@thesis/ckeditor5-llm-connector";
-import { GhostText } from "@thesis/ckeditor5-ghost-text";
+import { Frequency, LLMConnector } from "@/../../../ckeditor5-llm-connector";
+import { GhostText } from "@/../../../ckeditor5-ghost-text";
 import { llamaService } from "@/lib/services";
 
 export const EditorPage = () => {
@@ -76,8 +76,13 @@ export const EditorPage = () => {
                 Undo,
                 Dialog,
                 GhostText,
-                // LLMConnector,
+                LLMConnector,
               ],
+              llmConnector: {
+                onParameterSubmit: (data: Frequency) => {
+                  console.log(data);
+                },
+              },
               ghostText: {
                 debounceDelay: 300,
                 contentFetcher: llamaService(editorRef),
