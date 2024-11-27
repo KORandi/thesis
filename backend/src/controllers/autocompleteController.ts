@@ -36,7 +36,7 @@ export class AutocompleteController {
       return;
     }
 
-    if (!temperature || temperature < 0 || temperature > 1) {
+    if (temperature < 0 || temperature > 1) {
       res.status(400).json({ error: ERRORS.TEMPERATURE });
       return;
     }
