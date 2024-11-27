@@ -11,7 +11,8 @@ export class OpenAIService {
   async createStream(
     systemPrompt: string,
     examples: DataExample[],
-    userText: string
+    userText: string,
+    temperature: number
   ) {
     const stream = await this.openai.chat.completions.create({
       model: "gpt-4o-mini",
@@ -20,6 +21,7 @@ export class OpenAIService {
         ...examples,
         { role: "user", content: userText },
       ],
+      temperature,
       stream: true,
     });
 

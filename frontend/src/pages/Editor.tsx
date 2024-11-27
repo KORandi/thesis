@@ -1,5 +1,5 @@
 // src/pages/Editor.tsx
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import {
@@ -16,14 +16,38 @@ import { Button } from "@/components/ui/button";
 
 import "ckeditor5/ckeditor5.css";
 import "@thesis/ckeditor5-ghost-text/index.css";
-import { Frequency, LLMConnector } from "@/../../../ckeditor5-llm-connector";
-import { GhostText } from "@/../../../ckeditor5-ghost-text";
-import { llamaService } from "@/lib/services";
+import { gptService, llamaService } from "@/lib/services";
+import { LlmConnectorData } from "@thesis/ckeditor5-llm-connector/interfaces/llm-connector-data.js";
+import { ContentFetcherProps } from "@thesis/ckeditor5-ghost-text/interfaces/content-fetcher.js";
+import { GhostText } from "@thesis/ckeditor5-ghost-text";
+import { LLMConnector } from "@thesis/ckeditor5-llm-connector";
 
 export const EditorPage = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState<string | null>(null);
-  const editorRef = useRef<CKEditor<ClassicEditor>>(null);
+  const autocompleteConfigRef = useRef<LlmConnectorData>({
+    frequency: "onWordComplete",
+    temperature: 80,
+    model: "gpt",
+  });
+  const [, setAutocompleteConfig] = useReducer(
+    (state: LlmConnectorData, newState: LlmConnectorData) => {
+      autocompleteConfigRef.current = {
+        ...state,
+        ...newState,
+      };
+      return autocompleteConfigRef.current;
+    },
+    autocompleteConfigRef.current
+  );
+
+  const contentFetcher = useCallback((props: ContentFetcherProps) => {
+    if (autocompleteConfigRef.current.model === "gpt") {
+      return gptService(autocompleteConfigRef.current)(props);
+    } else {
+      return llamaService(autocompleteConfigRef.current)(props);
+    }
+  }, []);
 
   useEffect(() => {
     const storedUsername = localStorage.getItem("username");
@@ -53,7 +77,6 @@ export const EditorPage = () => {
       <main className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
         <div className="bg-white rounded-lg shadow p-6">
           <CKEditor
-            ref={editorRef}
             editor={ClassicEditor}
             data=""
             config={{
@@ -79,13 +102,14 @@ export const EditorPage = () => {
                 LLMConnector,
               ],
               llmConnector: {
-                onParameterSubmit: (data: Frequency) => {
+                onParameterSubmit: (data: LlmConnectorData) => {
                   console.log(data);
+                  setAutocompleteConfig(data);
                 },
               },
               ghostText: {
                 debounceDelay: 300,
-                contentFetcher: llamaService(editorRef),
+                contentFetcher,
               },
               placeholder: "Start writing your content here...",
             }}

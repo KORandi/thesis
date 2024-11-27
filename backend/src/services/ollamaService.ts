@@ -5,7 +5,8 @@ export class OllamaService {
   async createStream(
     systemPrompt: string,
     examples: DataExample[],
-    userText: string
+    userText: string,
+    temperature: number
   ) {
     const stream = await ollama.chat({
       model: "llama3.2",
@@ -14,6 +15,9 @@ export class OllamaService {
         ...examples,
         { role: "user", content: userText },
       ],
+      options: {
+        temperature,
+      },
       stream: true,
     });
 

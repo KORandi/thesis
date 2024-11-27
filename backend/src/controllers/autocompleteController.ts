@@ -2,6 +2,14 @@ import { Request, Response } from "express";
 import { OpenAIService } from "../services/openAIService";
 import { OllamaService } from "../services/ollamaService";
 import { DataExample } from "../data/examples";
+import { extractAroundCursor } from "../utils/extractAroundCursor";
+
+const ERRORS = {
+  CURSOR: "Input text must contain [[cursor]].",
+  TEMPERATURE: "Input temperature should be a number between 0 an 1",
+};
+
+const CURSOR_MARKER = "[[cursor]]";
 
 export class AutocompleteController {
   private service: OpenAIService | OllamaService;
@@ -19,10 +27,17 @@ export class AutocompleteController {
   }
 
   async handleRequest(req: Request, res: Response): Promise<void> {
-    const { text } = req.body;
+    const { text, temperature } = req.body;
 
-    if (!text || !text.includes("[[cursor]]")) {
-      res.status(400).json({ error: "Input text must contain [[cursor]]." });
+    const shortText = extractAroundCursor(text, CURSOR_MARKER, 500);
+
+    if (!shortText) {
+      res.status(400).json({ error: ERRORS.CURSOR });
+      return;
+    }
+
+    if (!temperature || temperature < 0 || temperature > 1) {
+      res.status(400).json({ error: ERRORS.TEMPERATURE });
       return;
     }
 
@@ -33,7 +48,8 @@ export class AutocompleteController {
       const { stream, abort, getContent } = await this.service.createStream(
         this.systemPrompt,
         this.dataExamples,
-        text
+        shortText,
+        temperature
       );
 
       req.on("close", () => {

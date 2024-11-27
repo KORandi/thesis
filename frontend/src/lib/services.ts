@@ -1,36 +1,8 @@
 import { ContentFetcherProps } from "@thesis/ckeditor5-ghost-text/interfaces/content-fetcher.d.ts";
 import { getPlainText } from "@thesis/ckeditor5-llm-connector";
 import { Frequency } from "@thesis/ckeditor5-llm-connector";
-import { ClassicEditor } from "ckeditor5";
-import { RefObject } from "react";
-import { CKEditor } from "@ckeditor/ckeditor5-react";
+import { LlmConnectorData } from "@thesis/ckeditor5-llm-connector/interfaces/llm-connector-data.js";
 
-/**
- * Initializes event listeners for configuration updates.
- * Updates the provided state variables on receiving relevant events.
- * @param ckeditor - A React ref object containing the CKEditor instance.
- * @param state - An object containing state variables to update.
- */
-const initializeEventListeners = (
-  ckeditor: RefObject<CKEditor<ClassicEditor>>,
-  state: { accuracy: number; frequency: Frequency; metadata: string }
-) => {
-  window.addEventListener("load", () => {
-    const editorInstance = ckeditor.current?.editor;
-    if (!editorInstance) return;
-
-    editorInstance.on("parameterConfig:submit", (_, data) => {
-      Object.assign(state, data);
-    });
-  });
-};
-
-/**
- * Determines whether autocomplete should trigger based on frequency and content.
- * @param content - The plain text content of the editor.
- * @param frequency - The frequency configuration for triggering autocomplete.
- * @returns A boolean indicating if autocomplete should trigger.
- */
 const shouldTriggerAutocomplete = (
   content: string,
   frequency: Frequency
@@ -49,11 +21,6 @@ const shouldTriggerAutocomplete = (
   }
 };
 
-/**
- * Creates a readable stream from a fetch response body.
- * @param response - The fetch response object.
- * @returns A readable stream or throws an error if not possible.
- */
 const createReadableStream = (response: Response): ReadableStream<string> => {
   return new ReadableStream({
     async start(controller) {
@@ -81,24 +48,10 @@ const createReadableStream = (response: Response): ReadableStream<string> => {
   });
 };
 
-/**
- * Creates a service for handling autocomplete integration with CKEditor.
- * @param ckeditor - A React ref object containing the CKEditor instance.
- * @param endpoint - The API endpoint for fetching autocomplete content.
- * @returns An async function for fetching autocomplete content.
- */
 const createAutocompleteService = (
-  ckeditor: RefObject<CKEditor<ClassicEditor>>,
+  state: LlmConnectorData,
   endpoint: string
 ) => {
-  const state = {
-    accuracy: 80,
-    frequency: "onWordComplete" as Frequency,
-    metadata: "",
-  };
-
-  initializeEventListeners(ckeditor, state);
-
   return async ({
     editor,
     signal,
@@ -114,8 +67,7 @@ const createAutocompleteService = (
 
     const requestBody = JSON.stringify({
       text: content,
-      accuracy: state.accuracy,
-      metadata: state.metadata,
+      temperature: state.temperature / 100,
     });
 
     const response = await fetch(endpoint, {
@@ -134,11 +86,8 @@ const createAutocompleteService = (
 };
 
 // Create specific services for LLaMA and GPT
-export const llamaService = (ckeditor: RefObject<CKEditor<ClassicEditor>>) =>
-  createAutocompleteService(
-    ckeditor,
-    "http://localhost:8000/llama/autocomplete"
-  );
+export const llamaService = (state: LlmConnectorData) =>
+  createAutocompleteService(state, "http://localhost:8000/llama/autocomplete");
 
-export const gptService = (ckeditor: RefObject<CKEditor<ClassicEditor>>) =>
-  createAutocompleteService(ckeditor, "http://localhost:8000/gpt/autocomplete");
+export const gptService = (state: LlmConnectorData) =>
+  createAutocompleteService(state, "http://localhost:8000/gpt/autocomplete");
