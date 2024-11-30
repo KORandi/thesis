@@ -1,5 +1,5 @@
 # Stage 1: Build the Vite frontend
-FROM node:16 AS build-frontend
+FROM node:18 AS build-frontend
 
 WORKDIR /app/frontend
 COPY ./frontend/package*.json ./
@@ -8,7 +8,7 @@ COPY ./frontend ./
 RUN npm run build
 
 # Stage 2: Build the TypeScript backend
-FROM node:16 AS build-backend
+FROM node:18 AS build-backend
 
 WORKDIR /app/backend
 COPY ./backend/package*.json ./
