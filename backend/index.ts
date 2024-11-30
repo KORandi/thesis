@@ -6,6 +6,7 @@ export const app = express();
 app.use(express.json());
 import gpt from "./src/api/gpt";
 import llama from "./src/api/llama";
+const path = require("path");
 
 app.use(
   cors({
@@ -15,11 +16,17 @@ app.use(
   })
 );
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8000;
 
-app.use("/gpt", gpt);
-app.use("/llama", llama);
+app.use("/api/gpt", gpt);
+app.use("/api/llama", llama);
+// Serve static files from the 'public' directory inside 'dist'
+app.use(express.static(path.join(__dirname, "public")));
 
+// Handle all other routes by serving the frontend
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });

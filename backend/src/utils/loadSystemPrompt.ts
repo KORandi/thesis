@@ -1,7 +1,7 @@
-import { readFileSync } from "fs";
-import { resolve } from "path";
+const path = require("path");
+const fs = require("fs");
 
 export const loadSystemPrompt = (): string => {
-  const filePath = resolve(__dirname, "../../prompts/systemPrompt.md");
-  return readFileSync(filePath, "utf-8");
+  const filePath = path.resolve(__dirname, "../../prompts/systemPrompt.md");
+  return fs.readFileSync(filePath, "utf8");
 };

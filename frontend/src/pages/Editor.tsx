@@ -103,7 +103,6 @@ export const EditorPage = () => {
               ],
               llmConnector: {
                 onParameterSubmit: (data: LlmConnectorData) => {
-                  console.log(data);
                   setAutocompleteConfig(data);
                 },
               },
