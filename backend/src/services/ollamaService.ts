@@ -1,5 +1,7 @@
-import ollama from "ollama";
+import { Ollama } from "ollama";
 import { DataExample } from "../data/examples";
+
+const API_URL = process.env.OLLAMA_URL || "http://127.0.0.1:11434";
 
 export class OllamaService {
   async createStream(
@@ -8,6 +10,7 @@ export class OllamaService {
     userText: string,
     temperature: number
   ) {
+    const ollama = new Ollama({ host: API_URL });
     const stream = await ollama.chat({
       model: "llama3.2",
       messages: [

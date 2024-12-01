@@ -20,11 +20,8 @@ const PORT = process.env.PORT || 8000;
 
 app.use("/api/gpt", gpt);
 app.use("/api/llama", llama);
-// Serve static files from the 'public' directory inside 'dist'
 app.use(express.static(path.join(__dirname, "public")));
-
-// Handle all other routes by serving the frontend
-app.get("*", (req, res) => {
+app.get("*", (_, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 app.listen(PORT, () => {
