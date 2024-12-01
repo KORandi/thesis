@@ -79,7 +79,10 @@ export const createAutocompleteService = (
 
     const response = await fetch(endpoint, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
       body: requestBody,
       signal,
     });

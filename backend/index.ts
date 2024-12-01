@@ -6,6 +6,7 @@ export const app = express();
 app.use(express.json());
 import gpt from "./src/api/gpt";
 import llama from "./src/api/llama";
+import authRouter from "./src/api/auth";
 const path = require("path");
 
 if (process.env.NODE_ENV === "development") {
@@ -19,7 +20,7 @@ if (process.env.NODE_ENV === "development") {
 }
 
 const PORT = process.env.PORT || 8000;
-
+app.use("/api/auth", authRouter);
 app.use("/api/gpt", gpt);
 app.use("/api/llama", llama);
 app.use(express.static(path.join(__dirname, "public")));

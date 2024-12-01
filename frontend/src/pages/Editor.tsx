@@ -1,4 +1,3 @@
-// src/pages/Editor.tsx
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CKEditor } from "@ckeditor/ckeditor5-react";

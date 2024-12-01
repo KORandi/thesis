@@ -3,6 +3,7 @@ import { AutocompleteController } from "../controllers/autocompleteController";
 import { OpenAIService } from "../services/openAIService";
 import { loadSystemPrompt } from "../utils/loadSystemPrompt";
 import { dataExamples } from "../data/examples";
+import { authMiddleware } from "../middlewares/auth";
 
 const router = Router();
 const systemPrompt = loadSystemPrompt();
@@ -13,9 +14,8 @@ const autocompleteController = new AutocompleteController(
   dataExamples
 );
 
-// Route setup
-router.post("/autocomplete", (req, res) =>
-  autocompleteController.handleRequest(req, res)
-);
+router.post("/autocomplete", authMiddleware, async (req, res) => {
+  await autocompleteController.handleRequest(req, res);
+});
 
 export default router;

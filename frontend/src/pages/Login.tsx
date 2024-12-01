@@ -1,4 +1,3 @@
-// src/pages/Login.tsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -6,19 +5,42 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
+const API_URL = import.meta.env.VITE_API_URL || "";
+
 export const LoginPage = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (username.trim()) {
-      // In a real app, you'd validate credentials here
+    setError("");
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(`${API_URL}/api/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Login failed");
+      }
+
+      localStorage.setItem("token", data.token);
       localStorage.setItem("username", username);
       navigate("/editor");
-    } else {
-      setError("Please enter a username");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Login failed");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -35,8 +57,17 @@ export const LoginPage = () => {
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter your username"
+                placeholder="Username"
                 className="w-full"
+                disabled={isLoading}
+              />
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+                className="w-full"
+                disabled={isLoading}
               />
             </div>
             {error && (
@@ -44,8 +75,8 @@ export const LoginPage = () => {
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-            <Button type="submit" className="w-full">
-              Login
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Logging in..." : "Login"}
             </Button>
           </form>
         </CardContent>

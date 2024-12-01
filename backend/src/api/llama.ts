@@ -3,6 +3,7 @@ import { AutocompleteController } from "../controllers/autocompleteController";
 import { OllamaService } from "../services/ollamaService";
 import { loadSystemPrompt } from "../utils/loadSystemPrompt";
 import { dataExamples } from "../data/examples";
+import { authMiddleware } from "../middlewares/auth";
 
 const router = Router();
 
@@ -14,7 +15,7 @@ const autocompleteController = new AutocompleteController(
   dataExamples
 );
 
-router.post("/autocomplete", (req, res) =>
+router.post("/autocomplete", authMiddleware, (req, res) =>
   autocompleteController.handleRequest(req, res)
 );
 

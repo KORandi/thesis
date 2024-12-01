@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Left bracket -->
+  <path d="M180 150 L140 256 L180 362" stroke="#2563eb" stroke-width="40" stroke-linecap="round" fill="none"/>
+  <!-- Right bracket -->
+  <path d="M332 150 L372 256 L332 362" stroke="#2563eb" stroke-width="40" stroke-linecap="round" fill="none"/>
+  
+  <!-- Center dot for AI -->
+  <circle cx="256" cy="256" r="20" fill="#2563eb"/>
+  
+  <!-- Connecting lines representing AI/automation -->
+  <path d="M256 236 L256 176" stroke="#2563eb" stroke-width="20" stroke-linecap="round"/>
+  <path d="M256 276 L256 336" stroke="#2563eb" stroke-width="20" stroke-linecap="round"/>
+  <path d="M236 256 L176 256" stroke="#2563eb" stroke-width="20" stroke-linecap="round"/>
+  <path d="M276 256 L336 256" stroke="#2563eb" stroke-width="20" stroke-linecap="round"/>
+</svg>
