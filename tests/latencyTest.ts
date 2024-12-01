@@ -3,12 +3,16 @@ import testPrompts from "./prompts.ts";
 
 const env = await load();
 const API_URL =
-  Deno.env.get("API_URL") || env["API_URL"] || "http://localhost:3000";
+  Deno.env.get("API_URL") || env["API_URL"] || "http://localhost:8000";
 
 interface LatencyResult {
   prompt: string;
   gptLatency: number;
   llamaLatency: number;
+  gptFirstTokenTime: number;
+  llamaFirstTokenTime: number;
+  gptTotalTokens: number;
+  llamaTotalTokens: number;
   error?: string;
   timestamp: string;
   difference: number;
@@ -39,10 +43,16 @@ async function authenticate(
   }
 }
 
-async function testGPTEndpoint(text: string, token: string): Promise<number> {
+async function testGPTEndpoint(
+  text: string,
+  token: string
+): Promise<{ totalTime: number; firstTokenTime: number; totalTokens: number }> {
   const startTime = performance.now();
+  let firstTokenTime = 0;
+  let totalTokens = 0;
+
   try {
-    await fetch(`${API_URL}/api/gpt/autocomplete`, {
+    const response = await fetch(`${API_URL}/api/gpt/autocomplete`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -53,17 +63,43 @@ async function testGPTEndpoint(text: string, token: string): Promise<number> {
         temperature: 0.7,
       }),
     });
-    return performance.now() - startTime;
+
+    const reader = response.body?.getReader();
+    if (!reader) throw new Error("No reader available");
+
+    let firstToken = true;
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      if (firstToken) {
+        firstTokenTime = performance.now() - startTime;
+        firstToken = false;
+      }
+      totalTokens += 1;
+    }
+
+    return {
+      totalTime: performance.now() - startTime,
+      firstTokenTime,
+      totalTokens,
+    };
   } catch (error) {
     console.error("GPT Endpoint Error:", error);
     throw error;
   }
 }
 
-async function testLlamaEndpoint(text: string, token: string): Promise<number> {
+async function testLlamaEndpoint(
+  text: string,
+  token: string
+): Promise<{ totalTime: number; firstTokenTime: number; totalTokens: number }> {
   const startTime = performance.now();
+  let firstTokenTime = 0;
+  let totalTokens = 0;
+
   try {
-    await fetch(`${API_URL}/api/llama/autocomplete`, {
+    const response = await fetch(`${API_URL}/api/llama/autocomplete`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -74,7 +110,27 @@ async function testLlamaEndpoint(text: string, token: string): Promise<number> {
         temperature: 0.7,
       }),
     });
-    return performance.now() - startTime;
+
+    const reader = response.body?.getReader();
+    if (!reader) throw new Error("No reader available");
+
+    let firstToken = true;
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      if (firstToken) {
+        firstTokenTime = performance.now() - startTime;
+        firstToken = false;
+      }
+      totalTokens += 1;
+    }
+
+    return {
+      totalTime: performance.now() - startTime,
+      firstTokenTime,
+      totalTokens,
+    };
   } catch (error) {
     console.error("Llama Endpoint Error:", error);
     throw error;
@@ -88,16 +144,20 @@ async function runLatencyTests(token: string) {
   for (const prompt of testPrompts) {
     console.log(`Testing prompt: ${prompt.substring(0, 50)}...`);
     try {
-      const gptLatency = await testGPTEndpoint(prompt, token);
+      const gptResults = await testGPTEndpoint(prompt, token);
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      const llamaLatency = await testLlamaEndpoint(prompt, token);
+      const llamaResults = await testLlamaEndpoint(prompt, token);
 
       results.push({
         prompt,
-        gptLatency,
-        llamaLatency,
+        gptLatency: gptResults.totalTime,
+        llamaLatency: llamaResults.totalTime,
+        gptFirstTokenTime: gptResults.firstTokenTime,
+        llamaFirstTokenTime: llamaResults.firstTokenTime,
+        gptTotalTokens: gptResults.totalTokens,
+        llamaTotalTokens: llamaResults.totalTokens,
         timestamp,
-        difference: gptLatency - llamaLatency,
+        difference: gptResults.totalTime - llamaResults.totalTime,
       });
 
       await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -106,6 +166,10 @@ async function runLatencyTests(token: string) {
         prompt,
         gptLatency: 0,
         llamaLatency: 0,
+        gptFirstTokenTime: 0,
+        llamaFirstTokenTime: 0,
+        gptTotalTokens: 0,
+        llamaTotalTokens: 0,
         error: error.message,
         timestamp,
         difference: 0,
@@ -132,13 +196,17 @@ function exportToFiles(results: LatencyResult[]) {
 
   const csvPath = `${resultsDir}/latency_results_${timestamp}.csv`;
   const csvHeader =
-    "Timestamp,Prompt,GPT Latency (ms),Llama Latency (ms),Difference (ms),Error\n";
+    "Timestamp,Prompt,GPT Latency,GPT First Token,GPT Total Tokens,Llama Latency,Llama First Token,Llama Total Tokens,Difference,Error\n";
   const csvContent = results
     .map(
       (result) =>
         `"${result.timestamp}","${result.prompt.replace(/"/g, '""')}",${
           result.gptLatency
-        },${result.llamaLatency},${result.difference},"${result.error || ""}"`
+        },${result.gptFirstTokenTime},${result.gptTotalTokens},${
+          result.llamaLatency
+        },${result.llamaFirstTokenTime},${result.llamaTotalTokens},${
+          result.difference
+        },"${result.error || ""}"`
     )
     .join("\n");
 
@@ -167,6 +235,14 @@ Min Latency: ${Math.min(...successfulTests.map((r) => r.gptLatency)).toFixed(
 Max Latency: ${Math.max(...successfulTests.map((r) => r.gptLatency)).toFixed(
     2
   )}ms
+Average First Token Time: ${(
+    successfulTests.reduce((sum, r) => sum + r.gptFirstTokenTime, 0) /
+    successfulTests.length
+  ).toFixed(2)}ms
+Average Total Tokens: ${(
+    successfulTests.reduce((sum, r) => sum + r.gptTotalTokens, 0) /
+    successfulTests.length
+  ).toFixed(1)}
 
 Llama Statistics
 ---------------
@@ -180,11 +256,33 @@ Min Latency: ${Math.min(...successfulTests.map((r) => r.llamaLatency)).toFixed(
 Max Latency: ${Math.max(...successfulTests.map((r) => r.llamaLatency)).toFixed(
     2
   )}ms
+Average First Token Time: ${(
+    successfulTests.reduce((sum, r) => sum + r.llamaFirstTokenTime, 0) /
+    successfulTests.length
+  ).toFixed(2)}ms
+Average Total Tokens: ${(
+    successfulTests.reduce((sum, r) => sum + r.llamaTotalTokens, 0) /
+    successfulTests.length
+  ).toFixed(1)}
 
-Average Difference: ${(
+Comparison
+----------
+Average Latency Difference: ${(
     successfulTests.reduce((sum, r) => sum + r.difference, 0) /
     successfulTests.length
   ).toFixed(2)}ms
+Average First Token Time Difference: ${(
+    successfulTests.reduce(
+      (sum, r) => sum + (r.gptFirstTokenTime - r.llamaFirstTokenTime),
+      0
+    ) / successfulTests.length
+  ).toFixed(2)}ms
+Average Total Tokens Difference: ${(
+    successfulTests.reduce(
+      (sum, r) => sum + (r.gptTotalTokens - r.llamaTotalTokens),
+      0
+    ) / successfulTests.length
+  ).toFixed(1)}
 `.trim();
 
   Deno.writeTextFileSync(summaryPath, summary);
