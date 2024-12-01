@@ -8,13 +8,15 @@ import gpt from "./src/api/gpt";
 import llama from "./src/api/llama";
 const path = require("path");
 
-app.use(
-  cors({
-    origin: "http://localhost:5173", // Replace with your frontend URL
-    methods: ["GET", "POST"], // Specify the methods you want to allow
-    credentials: true, // Include if you are using cookies or Authorization headers
-  })
-);
+if (process.env.NODE_ENV === "development") {
+  app.use(
+    cors({
+      origin: "http://localhost:5173",
+      methods: ["GET", "POST"],
+      credentials: true,
+    })
+  );
+}
 
 const PORT = process.env.PORT || 8000;
 
