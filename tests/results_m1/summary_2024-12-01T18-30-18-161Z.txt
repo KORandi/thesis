@@ -1,0 +1,20 @@
+Latency Test Summary
+===================
+Test Date: 2024-12-01T18:30:18.167Z
+Total Tests: 80
+Successful Tests: 80
+Failed Tests: 0
+
+GPT Statistics
+-------------
+Average Latency: 846.10ms
+Min Latency: 439.50ms
+Max Latency: 25741.40ms
+
+Llama Statistics
+---------------
+Average Latency: 606.64ms
+Min Latency: 302.19ms
+Max Latency: 8039.76ms
+
+Average Difference: 239.47ms

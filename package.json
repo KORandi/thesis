@@ -2,8 +2,14 @@
   "name": "thesis",
   "version": "1.0.0",
   "main": "index.js",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
   "scripts": {
-    "dev": "concurrently \"npm:dev --prefix backend\" \"npm:dev --prefix frontend\""
+    "dev": "concurrently \"npm:dev --prefix backend\" \"npm:dev --prefix frontend\"",
+    "test:latency": "deno run --allow-net --allow-env --allow-read --allow-write latencyTest.ts",
+    "install": "npm install --workspaces"
   },
   "keywords": [],
   "author": "",
