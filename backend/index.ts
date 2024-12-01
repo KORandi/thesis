@@ -11,7 +11,7 @@ const path = require("path");
 if (process.env.NODE_ENV === "development") {
   app.use(
     cors({
-      origin: "http://localhost:5173",
+      origin: "*",
       methods: ["GET", "POST"],
       credentials: true,
     })

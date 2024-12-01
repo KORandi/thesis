@@ -6,22 +6,14 @@ export function extractAroundCursor(
   const cursorIndex = text.indexOf(cursorMarker);
 
   if (cursorIndex === -1) {
-    return null; // Cursor not found
+    return null;
   }
 
-  // Calculate start and end indices
   const startIndex = Math.max(0, cursorIndex - contextSize);
   const endIndex = Math.min(
     text.length,
     cursorIndex + cursorMarker.length + contextSize
   );
-
-  // Extract the substring
   const substring = text.slice(startIndex, endIndex);
   return substring;
 }
-
-// Example usage
-const longString = "..."; // Replace with your long string
-const result = extractAroundCursor(longString);
-console.log(result);

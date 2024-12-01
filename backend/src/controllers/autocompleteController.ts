@@ -94,7 +94,7 @@ export class AutocompleteController {
   }
 
   private handleError(res: Response, error: any): void {
-    console.error("Error handling request:", error.message || error);
+    console.error("Error handling request:", error);
 
     if (!res.writableEnded) {
       const statusCode =
