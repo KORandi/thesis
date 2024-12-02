@@ -154,11 +154,3 @@ npm run build      # Production build
 npm run lint       # ESLint checks
 npm run preview    # Preview build
 ```
-
-## Environment Setup
-
-Required environment variables:
-
-```bash
-VITE_API_URL      # Backend API endpoint
-```
