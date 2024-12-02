@@ -21,11 +21,6 @@ npm run dev
    VITE_API_URL=http://localhost:8000  # Your API endpoint
    ```
 
-2. Install required plugins:
-   ```bash
-   npm install @thesis/ckeditor5-llm-connector @thesis/ckeditor5-ghost-text
-   ```
-
 ## Core Features
 
 ### Autocomplete Configuration
