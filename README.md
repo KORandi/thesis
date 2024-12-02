@@ -115,4 +115,4 @@ The Express backend that handles our LLM requests and authentication.
 
 A testing utility that helps us optimize the editor's performance across different LLM endpoints.
 
-[📖 Latency Testing Documentation](./latency-testing/README.md)
+[📖 Latency Testing Documentation](./tests/README.md)
