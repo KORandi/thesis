@@ -53,6 +53,36 @@ A modern text editor suite that leverages GPT and LLaMA models for intelligent t
    - Frontend: http://localhost:5173
    - Backend: http://localhost:8000
 
+### Project Structure
+
+```
+thesis/
+├── frontend/          # Main React application
+│   ├── src/          # Source code
+│   └── package.json  # Frontend dependencies
+├── backend/          # Express API
+│   ├── src/         # Backend source
+│   └── package.json # Backend dependencies
+├── latency-testing/ # Performance testing tool
+└── package.json     # Workspace configuration
+```
+
+## Available Scripts
+
+```bash
+# Root directory
+npm run dev          # Start all services
+
+# Frontend directory
+npm run dev          # Start Vite dev server
+npm run build        # Create production build
+npm run preview      # Preview production build
+
+# Backend directory
+npm run dev          # Start development server
+npm run build        # Compile TypeScript
+npm start           # Run production server
+```
 
 ## Projects Overview
 
@@ -128,35 +158,4 @@ const getCompletion = async (text: string) => {
   });
   // Handle streaming response
 };
-```
-
-### Project Structure
-
-```
-thesis/
-├── frontend/          # Main React application
-│   ├── src/          # Source code
-│   └── package.json  # Frontend dependencies
-├── backend/          # Express API
-│   ├── src/         # Backend source
-│   └── package.json # Backend dependencies
-├── latency-testing/ # Performance testing tool
-└── package.json     # Workspace configuration
-```
-
-## Available Scripts
-
-```bash
-# Root directory
-npm run dev          # Start all services
-
-# Frontend directory
-npm run dev          # Start Vite dev server
-npm run build        # Create production build
-npm run preview      # Preview production build
-
-# Backend directory
-npm run dev          # Start development server
-npm run build        # Compile TypeScript
-npm start           # Run production server
 ```
