@@ -1,131 +1,106 @@
-# AI-Powered Text Autocomplete Backend
+# Context-Aware Autocomplete Backend
 
-A Node.js/Express backend service that provides text autocomplete functionality using both OpenAI's GPT and Ollama's local LLM models. The service processes text with a `[[cursor]]` marker and generates contextually appropriate completions using AI models.
-
-## Features
-
-- Dual model support:
-  - OpenAI GPT integration
-  - Local Ollama LLM integration
-- Streaming response support
-- Built-in examples for better context
-- CORS configuration for frontend integration
-- TypeScript implementation
-- Environment variable configuration
+A TypeScript/Express backend service that processes text input with a `[[cursor]]` marker to generate contextually relevant completions using GPT and Llama models.
 
 ## Prerequisites
 
-- Node.js (v16 or higher)
-- OpenAI API key (for GPT functionality)
-- Ollama installed locally (for local LLM functionality)
+1. Node.js 16+
+2. OpenAI API key
+3. Ollama installed and running locally
+
+## Tech Stack
+
+- Node.js/Express
 - TypeScript
+- OpenAI API (GPT-4o-mini)
+- Ollama (Llama 3.2)
+- JWT Authentication
+- Streaming Responses
 
-## Installation
+## Setup
 
-1. Clone the repository
-2. Install dependencies:
+Install dependencies:
+
 ```bash
 npm install
 ```
-3. Create a `.env` file in the root directory with the following variables:
+
+Configure environment:
+
 ```env
-PORT=3000
-OPENAI_API_KEY=your_openai_api_key_here
+PORT=8000
+NODE_ENV=development
+OPENAI_API_KEY=your_key
+JWT_SECRET=your_secret
+ADMIN_PASSWORD=your_password
+OLLAMA_URL=http://127.0.0.1:11434
 ```
 
-## Project Structure
+## API Endpoints
+
+### Authentication
 
 ```
-├── src/
-│   ├── api/
-│   │   ├── gpt.ts
-│   │   └── llama.ts
-│   ├── controllers/
-│   │   └── autocompleteController.ts
-│   ├── services/
-│   │   ├── openAIService.ts
-│   │   └── ollamaService.ts
-│   ├── data/
-│   │   └── examples.ts
-│   └── utils/
-│       └── loadSystemPrompt.ts
-├── prompts/
-│   └── systemPrompt.md
-└── index.ts
+POST /api/auth/login
+Body: { username: string, password: string }
+Returns: { token: string }
 ```
 
-## Usage
+### Text Completion
 
-1. Start the server:
-```bash
-npm start
 ```
-
-2. The server will start on `http://localhost:3000` (or the port specified in your .env file)
-
-3. Available endpoints:
-   - `/gpt/autocomplete` - OpenAI GPT-based autocomplete
-   - `/llama/autocomplete` - Ollama-based autocomplete
-
-4. Send POST requests to either endpoint with the following JSON structure:
-```json
-{
-  "text": "Your text with a [[cursor]] marker"
+POST /api/gpt/autocomplete
+POST /api/llama/autocomplete
+Headers: Authorization: Bearer <token>
+Body: {
+  text: string (with [[cursor]] marker),
+  temperature: number (0-1)
 }
+Returns: Streamed completion text
 ```
 
-## API Documentation
+## Core Functions
 
-### POST /gpt/autocomplete or /llama/autocomplete
-
-Request body:
-```json
-{
-  "text": "The old castle loomed in the distance, its silhouette [[cursor]] against the setting sun."
-}
-```
-
-Response:
-- Content-Type: text/plain
-- Transfer-Encoding: chunked
-- Streams the generated completion text
-
-Error Responses:
-- 400: Input text must contain [[cursor]]
-- 500: Internal server error
-
-## Configuration
-
-The system prompt and example data can be modified in:
-- `prompts/systemPrompt.md` - System prompt for AI models
-- `src/data/examples.ts` - Training examples for better context
+- Context extraction (500 chars around cursor)
+- Streaming response handling
+- Model-agnostic architecture
+- JWT-based route protection
+- Error handling with appropriate status codes
 
 ## Development
 
-The project uses nodemon for development, which automatically restarts the server when files are changed:
 ```bash
-npm start
+npm run dev     # Development with hot-reload
+npm run build   # Compile TypeScript
+npm start       # Production server
 ```
 
-## Dependencies
+## Error Handling
 
-- express: Web framework
-- openai: OpenAI API client
-- ollama: Ollama API client
-- cors: CORS middleware
-- dotenv: Environment variable management
-- typescript: TypeScript support
-- nodemon: Development server
-- ts-node: TypeScript execution
+- 400: Invalid input (missing cursor, invalid temperature)
+- 401: Authentication failures
+- 500: Server errors
 
-## Contributing
+## Type Definitions
 
-1. Fork the repository
-2. Create your feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a new Pull Request
+Key interfaces available in `types.d.ts`. Services implement standardized stream handling for both GPT and Llama models.
 
-## License
+## Architecture
 
-This project is licensed under the ISC License.
+```
+src/
+  ├── api/          # Route definitions
+  ├── controllers/  # Request handling
+  ├── services/     # Model implementations
+  ├── middlewares/  # Auth, validation
+  ├── utils/        # Helpers
+  └── data/         # Training examples
+```
+
+## Notes
+
+- Default port: 8000
+- Development CORS: all origins
+- JWT expiry: 24h
+- Cursor marker: [[cursor]]
+- Context window: 500 chars
