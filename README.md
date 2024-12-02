@@ -59,7 +59,7 @@ A testing utility that helps us optimize the editor's performance across differe
 1. **Clone and Install:**
 
    ```bash
-   git clone <repository-url>
+   git clone git@github.com:KORandi/thesis.git
    cd thesis
    npm install
    ```
