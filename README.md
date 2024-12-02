@@ -21,6 +21,39 @@ A modern text editor suite that leverages GPT and LLaMA models for intelligent t
 - Ollama installed and running locally ([Installation Guide](https://ollama.ai/download))
 - Git ([Download](https://git-scm.com/downloads))
 
+## Quick Start
+
+1. **Clone and Install:**
+
+   ```bash
+   git clone git@github.com:KORandi/thesis.git
+   cd thesis
+   npm install
+   ```
+
+2. **Configure Environment:**
+
+   ```bash
+   # Frontend (.env in frontend directory)
+   VITE_API_URL=http://localhost:8000
+
+   # Backend (.env in backend directory)
+   PORT=8000
+   OPENAI_API_KEY=your_key
+   JWT_SECRET=your_secret
+   ADMIN_PASSWORD=your_password
+   OLLAMA_URL=http://127.0.0.1:11434
+   ```
+
+3. **Start Development Environment:**
+   ```bash
+   npm run dev
+   ```
+   This launches:
+   - Frontend: http://localhost:5173
+   - Backend: http://localhost:8000
+
+
 ## Projects Overview
 
 ### 1. Context-Aware Autocomplete Editor
@@ -53,38 +86,6 @@ The Express backend that handles our LLM requests and authentication.
 A testing utility that helps us optimize the editor's performance across different LLM endpoints.
 
 [📖 Latency Testing Documentation](./latency-testing/README.md)
-
-## Quick Start
-
-1. **Clone and Install:**
-
-   ```bash
-   git clone git@github.com:KORandi/thesis.git
-   cd thesis
-   npm install
-   ```
-
-2. **Configure Environment:**
-
-   ```bash
-   # Frontend (.env in frontend directory)
-   VITE_API_URL=http://localhost:8000
-
-   # Backend (.env in backend directory)
-   PORT=8000
-   OPENAI_API_KEY=your_key
-   JWT_SECRET=your_secret
-   ADMIN_PASSWORD=your_password
-   OLLAMA_URL=http://127.0.0.1:11434
-   ```
-
-3. **Start Development Environment:**
-   ```bash
-   npm run dev
-   ```
-   This launches:
-   - Frontend: http://localhost:5173
-   - Backend: http://localhost:8000
 
 ## Development Workflow
 
