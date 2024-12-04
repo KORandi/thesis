@@ -1,0 +1,28 @@
+Latency Test Summary
+===================
+Test Date: 2024-12-03T12:53:43.222Z
+Total Tests: 80
+Successful Tests: 80
+Failed Tests: 0
+
+GPT Statistics
+-------------
+Average Latency: 896.88ms
+Min Latency: 450.33ms
+Max Latency: 23485.67ms
+Average First Token Time: 872.15ms
+Average Total Tokens: 2.0
+
+Llama Statistics
+---------------
+Average Latency: 272.29ms
+Min Latency: 230.35ms
+Max Latency: 431.21ms
+Average First Token Time: 236.47ms
+Average Total Tokens: 4.4
+
+Comparison
+----------
+Average Latency Difference: 624.59ms
+Average First Token Time Difference: 635.68ms
+Average Total Tokens Difference: -2.3
