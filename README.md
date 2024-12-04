@@ -6,7 +6,7 @@ A modern text editor suite that leverages GPT and LLaMA models for intelligent t
 
 ### Required Software & Accounts
 
-- Node.js 16+ ([Download](https://nodejs.org/))
+- Node.js 18+ ([Download](https://nodejs.org/))
 - Deno ^1.37 (for latency testing tool)
 
   ```bash
