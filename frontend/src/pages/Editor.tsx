@@ -6,9 +6,7 @@ import {
   ClassicEditor,
   Essentials,
   Italic,
-  Mention,
   Paragraph,
-  Undo,
   Dialog,
 } from "ckeditor5";
 import { Button } from "@/components/ui/button";
@@ -77,29 +75,26 @@ export const EditorPage = () => {
         <div className="bg-white rounded-lg shadow p-6">
           <CKEditor
             editor={ClassicEditor}
-            data=""
             config={{
-              toolbar: {
-                items: [
-                  "undo",
-                  "redo",
-                  "|",
-                  "bold",
-                  "italic",
-                  "parameterConfig",
-                ],
-              },
+              licenseKey: "GPL",
+              toolbar: [
+                "undo",
+                "redo",
+                "|",
+                "bold",
+                "italic",
+                "parameterConfig",
+              ],
               plugins: [
-                Bold,
                 Essentials,
-                Italic,
-                Mention,
                 Paragraph,
-                Undo,
+                Bold,
+                Italic,
                 Dialog,
                 GhostText,
                 LLMConnector,
               ],
+              //@ts-ignore
               llmConnector: {
                 onParameterSubmit: (data: LlmConnectorData) => {
                   setAutocompleteConfig(data);

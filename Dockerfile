@@ -1,21 +1,23 @@
 # Stage 1: Build the Vite frontend
-FROM node:18 AS build-frontend
+FROM node:18.20.4 AS build-frontend
 
 WORKDIR /app/frontend
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 COPY ./frontend/package*.json ./
 RUN npm install
 COPY ./frontend ./
 RUN npm run build
 
 # Stage 2: Build the TypeScript backend
-FROM node:18 AS build-backend
+FROM node:18.20.4 AS build-backend
 
 WORKDIR /app/backend
 COPY ./backend/package*.json ./
+RUN npm install
 COPY ./backend/tsconfig.json ./
 COPY ./backend ./
 
-RUN npm install
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 RUN npm run build
 
 # Copy Vite build files into the backend's public directory
