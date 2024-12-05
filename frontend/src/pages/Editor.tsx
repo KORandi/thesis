@@ -1,23 +1,23 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import {
   Bold,
   ClassicEditor,
+  Dialog,
   Essentials,
   Italic,
   Paragraph,
-  Dialog,
 } from "ckeditor5";
-import { Button } from "@/components/ui/button";
 
 import "ckeditor5/ckeditor5.css";
 import "@thesis/ckeditor5-ghost-text/index.css";
-import { gptService, llamaService } from "@/lib/services";
-import { LlmConnectorData } from "@thesis/ckeditor5-llm-connector/interfaces/llm-connector-data.js";
-import { ContentFetcherProps } from "@thesis/ckeditor5-ghost-text/interfaces/content-fetcher.js";
 import { GhostText } from "@thesis/ckeditor5-ghost-text";
 import { LLMConnector } from "@thesis/ckeditor5-llm-connector";
+import { LlmConnectorData } from "@thesis/ckeditor5-llm-connector/interfaces/llm-connector-data.js";
+import { ContentFetcherProps } from "@thesis/ckeditor5-ghost-text/interfaces/content-fetcher.js";
+import { gptService, llamaService } from "@/lib/services";
 
 export const EditorPage = () => {
   const navigate = useNavigate();
@@ -73,6 +73,27 @@ export const EditorPage = () => {
 
       <main className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
         <div className="bg-white rounded-lg shadow p-6">
+          <p className="text-sm text-gray-600 mb-4">
+            <strong>Usage Tips:</strong>
+            <ul className="list-disc pl-5">
+              <li>
+                Press <kbd>Tab</kbd> to accept a suggestion or{" "}
+                <kbd>Shift + Tab</kbd> to change it.
+              </li>
+              <li>
+                Configure suggestions by clicking the AI Text button in the
+                toolbar.
+              </li>
+              <li>
+                Suggestions appear automatically based on your typing frequency.
+              </li>
+              <li>
+                Temperature controls the randomness of suggestions. Lower values
+                make suggestions more predictable, while higher values make them
+                more creative.
+              </li>
+            </ul>
+          </p>
           <CKEditor
             editor={ClassicEditor}
             config={{
@@ -94,7 +115,6 @@ export const EditorPage = () => {
                 GhostText,
                 LLMConnector,
               ],
-              //@ts-ignore
               llmConnector: {
                 onParameterSubmit: (data: LlmConnectorData) => {
                   setAutocompleteConfig(data);
@@ -103,6 +123,9 @@ export const EditorPage = () => {
               ghostText: {
                 debounceDelay: 300,
                 contentFetcher,
+                keystrokes: {
+                  insertGhostText: "Shift + Tab",
+                },
               },
               placeholder: "Start writing your content here...",
             }}

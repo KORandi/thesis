@@ -1,9 +1,8 @@
+import { ContentFetcherProps } from "@thesis/ckeditor5-ghost-text/interfaces/content-fetcher.js";
+import { Frequency, getPlainText } from "@thesis/ckeditor5-llm-connector";
+import { LlmConnectorData } from "@thesis/ckeditor5-llm-connector/interfaces/llm-connector-data.js";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { ContentFetcherProps } from "@thesis/ckeditor5-ghost-text/interfaces/content-fetcher.d.ts";
-import { getPlainText } from "@thesis/ckeditor5-llm-connector";
-import { Frequency } from "@thesis/ckeditor5-llm-connector";
-import { LlmConnectorData } from "@thesis/ckeditor5-llm-connector/interfaces/llm-connector-data.js";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
