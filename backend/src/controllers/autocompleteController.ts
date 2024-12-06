@@ -11,6 +11,24 @@ const ERRORS = {
 
 const CURSOR_MARKER = "[[cursor]]";
 
+const processExamples = (dataExamples: DataExample[]) => {
+  return dataExamples.map(({ role, content }) => {
+    return role === "assistant"
+      ? { role, content }
+      : {
+          role,
+          content: JSON.stringify({
+            metadata: {
+              user_name: "Konstantin Kožokar",
+              user_role: "writer",
+              assistant_role: "autocomplete",
+            },
+            document: content,
+          }),
+        };
+  });
+};
+
 export class AutocompleteController {
   private service: OpenAIService | OllamaService;
   private systemPrompt: string;
@@ -23,7 +41,7 @@ export class AutocompleteController {
   ) {
     this.service = service;
     this.systemPrompt = systemPrompt;
-    this.dataExamples = dataExamples;
+    this.dataExamples = processExamples(dataExamples);
   }
 
   async handleRequest(req: Request, res: Response): Promise<void> {
@@ -66,6 +84,8 @@ export class AutocompleteController {
       shortText,
       temperature
     );
+
+    console.log(this.dataExamples);
 
     let responseEnded = false;
 

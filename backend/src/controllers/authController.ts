@@ -11,6 +11,11 @@ export class AuthController {
         return;
       }
 
+      if (!this.validateUsername(username)) {
+        res.status(400).json({ error: "Invalid username format" });
+        return;
+      }
+
       if (!validatePassword(password)) {
         res.status(401).json({ error: "Invalid credentials" });
         return;
@@ -21,5 +26,11 @@ export class AuthController {
     } catch (error) {
       res.status(500).json({ error: "Login failed" });
     }
+  }
+
+  private validateUsername(username: string): boolean {
+    // Allow only alphanumerics, spaces, dashes, underscores, and dots
+    const validFormat = /^[a-zA-Z0-9\s\-_.]{1,50}$/;
+    return validFormat.test(username);
   }
 }
