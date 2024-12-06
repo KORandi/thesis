@@ -1,5 +1,7 @@
 import { OpenAI } from "openai";
 import { DataExample } from "../data/examples";
+import type { User } from "../middlewares/auth";
+import { addMetadata, preprocessData } from "../utils/preprocessData";
 
 export class OpenAIService {
   private openai: OpenAI;
@@ -9,17 +11,24 @@ export class OpenAIService {
   }
 
   async createStream(
-    systemPrompt: string,
+    user: User,
     examples: DataExample[],
-    userText: string,
-    temperature: number
+    {
+      systemPrompt,
+      userText,
+      temperature,
+    }: {
+      systemPrompt: string;
+      userText: string;
+      temperature: number;
+    }
   ) {
     const stream = await this.openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         { role: "system", content: systemPrompt },
-        ...examples,
-        { role: "user", content: userText },
+        ...preprocessData(examples, user.username),
+        { role: "user", content: addMetadata(userText, user.username) },
       ],
       temperature,
       stream: true,

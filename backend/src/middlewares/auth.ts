@@ -5,10 +5,14 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 const JWT_ERROR = "JWT_SECRET has not been set";
 
+export interface User {
+  username: string;
+}
+
 declare global {
   namespace Express {
     interface Request {
-      user?: { username: string };
+      user?: User;
     }
   }
 }
@@ -18,10 +22,10 @@ export const generateToken = (username: string): string => {
   return jwt.sign({ username }, JWT_SECRET, { expiresIn: "24h" });
 };
 
-export const verifyToken = (token: string): { username: string } | null => {
+export const verifyToken = (token: string): User | null => {
   try {
     if (!JWT_SECRET) throw new Error(JWT_ERROR);
-    return jwt.verify(token, JWT_SECRET) as { username: string };
+    return jwt.verify(token, JWT_SECRET) as User;
   } catch {
     return null;
   }

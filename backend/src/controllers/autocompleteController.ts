@@ -3,6 +3,7 @@ import { OpenAIService } from "../services/openAIService";
 import { OllamaService } from "../services/ollamaService";
 import { DataExample } from "../data/examples";
 import { extractAroundCursor } from "../utils/extractAroundCursor";
+import type { User } from "../middlewares/auth";
 
 const ERRORS = {
   CURSOR: "Input text must contain [[cursor]].",
@@ -10,24 +11,6 @@ const ERRORS = {
 };
 
 const CURSOR_MARKER = "[[cursor]]";
-
-const processExamples = (dataExamples: DataExample[]) => {
-  return dataExamples.map(({ role, content }) => {
-    return role === "assistant"
-      ? { role, content }
-      : {
-          role,
-          content: JSON.stringify({
-            metadata: {
-              user_name: "Konstantin Kožokar",
-              user_role: "writer",
-              assistant_role: "autocomplete",
-            },
-            document: content,
-          }),
-        };
-  });
-};
 
 export class AutocompleteController {
   private service: OpenAIService | OllamaService;
@@ -41,10 +24,10 @@ export class AutocompleteController {
   ) {
     this.service = service;
     this.systemPrompt = systemPrompt;
-    this.dataExamples = processExamples(dataExamples);
+    this.dataExamples = dataExamples;
   }
 
-  async handleRequest(req: Request, res: Response): Promise<void> {
+  async handleRequest(req: Request, res: Response, user: User): Promise<void> {
     try {
       const { text, temperature } = req.body;
 
@@ -56,7 +39,7 @@ export class AutocompleteController {
       res.setHeader("Content-Type", "text/plain; charset=utf-8");
       res.setHeader("Transfer-Encoding", "chunked");
 
-      await this.streamResponse(res, shortText, temperature, req);
+      await this.streamResponse(req, res, { shortText, temperature, user });
     } catch (error) {
       this.handleError(res, error);
     }
@@ -73,19 +56,27 @@ export class AutocompleteController {
   }
 
   private async streamResponse(
+    req: Request,
     res: Response,
-    shortText: string,
-    temperature: number,
-    req: Request
+    {
+      shortText,
+      temperature,
+      user,
+    }: {
+      shortText: string;
+      temperature: number;
+      user: User;
+    }
   ): Promise<void> {
     const { stream, abort, getContent } = await this.service.createStream(
-      this.systemPrompt,
+      user,
       this.dataExamples,
-      shortText,
-      temperature
+      {
+        userText: shortText,
+        temperature,
+        systemPrompt: this.systemPrompt,
+      }
     );
-
-    console.log(this.dataExamples);
 
     let responseEnded = false;
 

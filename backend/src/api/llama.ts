@@ -15,8 +15,13 @@ const autocompleteController = new AutocompleteController(
   dataExamples
 );
 
-router.post("/autocomplete", authMiddleware, (req, res) =>
-  autocompleteController.handleRequest(req, res)
-);
+router.post("/autocomplete", authMiddleware, (req, res) => {
+  const user = req.user;
+  if (!user) {
+    res.status(500).json({ error: "Authentication error" });
+    return;
+  }
+  autocompleteController.handleRequest(req, res, user);
+});
 
 export default router;

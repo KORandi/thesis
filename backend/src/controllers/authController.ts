@@ -29,8 +29,8 @@ export class AuthController {
   }
 
   private validateUsername(username: string): boolean {
-    // Allow only alphanumerics, spaces, dashes, underscores, and dots
-    const validFormat = /^[a-zA-Z0-9\s\-_.]{1,50}$/;
+    // Allow any letter (from any alphabet), digits, spaces, dashes, underscores, and dots
+    const validFormat = /^[\p{L}0-9\s\-_.]{1,50}$/u;
     return validFormat.test(username);
   }
 }
