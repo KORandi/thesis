@@ -72,7 +72,7 @@ export const createAutocompleteService = (
     }
 
     const requestBody = JSON.stringify({
-      text: content,
+      text: getContextWindow(content),
       temperature: state.temperature / 100,
     });
 
@@ -92,4 +92,14 @@ export const createAutocompleteService = (
 
     return createReadableStream(response);
   };
+};
+
+const getContextWindow = (text: string, size = 1000) => {
+  const cursorPosition = text.indexOf("[[cursor]]");
+  if (cursorPosition === -1) return text;
+
+  const start = Math.max(0, cursorPosition - size);
+  const end = Math.min(text.length, cursorPosition + size);
+
+  return text.slice(start, end);
 };
