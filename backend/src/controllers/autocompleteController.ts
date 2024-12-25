@@ -50,7 +50,7 @@ export class AutocompleteController {
       throw new Error(ERRORS.CURSOR);
     }
 
-    if (typeof temperature !== "number" || temperature < 0 || temperature > 1) {
+    if (typeof temperature !== "number" || temperature < 0 || temperature > 2) {
       throw new Error(ERRORS.TEMPERATURE);
     }
   }
