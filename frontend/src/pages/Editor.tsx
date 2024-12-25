@@ -26,6 +26,7 @@ export const EditorPage = () => {
     frequency: "onWordComplete",
     temperature: 80,
     model: "gpt",
+    debounce: 500,
   });
   const [, setAutocompleteConfig] = useReducer(
     (state: LlmConnectorData, newState: LlmConnectorData) => {
@@ -37,6 +38,10 @@ export const EditorPage = () => {
     },
     autocompleteConfigRef.current
   );
+
+  const getDebounceDelay = () => {
+    return autocompleteConfigRef.current.debounce;
+  };
 
   const contentFetcher = useCallback((props: ContentFetcherProps) => {
     if (autocompleteConfigRef.current.model === "gpt") {
@@ -121,7 +126,7 @@ export const EditorPage = () => {
                 },
               },
               ghostText: {
-                debounceDelay: 300,
+                debounceDelay: getDebounceDelay,
                 contentFetcher,
                 keystrokes: {
                   insertGhostText: "Shift + Tab",
